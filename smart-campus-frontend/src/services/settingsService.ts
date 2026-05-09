@@ -13,7 +13,7 @@ export const settingsService = {
     try {
       return asApiData(await api.get('/settings'));
     } catch (error) {
-      withServiceError(error, 'Failed to load settings');
+      return withServiceError(error, 'Failed to load settings');
     }
   },
 
@@ -21,7 +21,7 @@ export const settingsService = {
     try {
       return asApiData(await api.put('/settings', settings));
     } catch (error) {
-      withServiceError(error, 'Failed to save settings');
+      return withServiceError(error, 'Failed to save settings');
     }
   }
 };
