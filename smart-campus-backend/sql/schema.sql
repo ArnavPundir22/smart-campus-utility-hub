@@ -373,8 +373,8 @@ INSERT INTO clubs (name, description, category, contact_email) VALUES
 ('Drama Club', 'Theater and Performing Arts', 'Cultural', 'drama@smartcampus.edu');
 
 -- Insert default system settings
-INSERT INTO system_settings (id, academic_year, current_semester, campus_name, updated_by) VALUES
-(1, '2024-2025', 'Fall', 'Smart Campus University', 1);
+INSERT INTO system_settings (id, academic_year, current_semester, campus_name) VALUES
+(1, '2024-2025', 'Fall', 'Smart Campus University');
 
 
 -- =====================================================================

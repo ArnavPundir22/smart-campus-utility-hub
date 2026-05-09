@@ -121,11 +121,11 @@ export default function Settings() {
               onClick={handleSave}
               className="bg-primary text-primary-foreground font-semibold glow-primary-hover"
               asChild
-              disabled={isLoading || isSaving}
             >
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
+                disabled={isLoading || isSaving}
               >
                 {isSaving ? 'Saving...' : 'Save Changes'}
               </motion.button>
