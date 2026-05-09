@@ -120,15 +120,15 @@ export default function Settings() {
             <Button
               onClick={handleSave}
               className="bg-primary text-primary-foreground font-semibold glow-primary-hover"
-              asChild
+              disabled={isLoading || isSaving}
             >
-              <motion.button
+              <motion.span
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
-                disabled={isLoading || isSaving}
+                className="inline-block"
               >
                 {isSaving ? 'Saving...' : 'Save Changes'}
-              </motion.button>
+              </motion.span>
             </Button>
           </TabsContent>
 

@@ -12,7 +12,6 @@ const getSettings = async () => {
       SELECT academic_year, current_semester, campus_name
       FROM system_settings
       WHERE id = 1
-      LIMIT 1
     `
   );
 
