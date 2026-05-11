@@ -592,3 +592,4 @@ For more troubleshooting, see [Backend Troubleshooting Guide](./smart-campus-bac
 [Report Bug](https://github.com/KanavCode/smart-campus-utility-hub/issues) · [Request Feature](https://github.com/KanavCode/smart-campus-utility-hub/issues) · [Documentation](./smart-campus-backend/README.md) · [Contributing](./CONTRIBUTING.md)
 
 </div>
+---
