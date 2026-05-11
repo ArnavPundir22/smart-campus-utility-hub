@@ -338,17 +338,25 @@ Comprehensive API documentation is available in the backend directory:
 - `GET /api/timetable` - Get timetable
 - `POST /api/timetable/generate` - Generate timetable
 - `GET /api/timetable/conflicts` - Check conflicts
+- `GET /api/timetable/group/:groupId/ical` - Export group timetable as iCal
 
 #### Electives
 - `GET /api/electives` - Get available electives
 - `POST /api/electives/select` - Submit preferences
 - `POST /api/electives/allocate` - Admin allocation
+- `GET /api/electives/my/waitlist` - Get student waitlist status
+- `POST /api/electives/waitlist/process` - Process waitlist auto-enrollment (admin)
 
 #### Events
 - `GET /api/events` - Get all events
 - `POST /api/events` - Create event
 - `GET /api/events/:id` - Get event details
 - `POST /api/events/:id/rsvp` - RSVP to event
+
+#### Notifications
+- `GET /api/notifications` - Get in-app notifications
+- `PATCH /api/notifications/:id/read` - Mark a notification as read
+- `PATCH /api/notifications/read-all` - Mark all notifications as read
 
 For detailed request/response examples, see [Backend API Documentation](./smart-campus-backend/README.md#-api-endpoints).
 
