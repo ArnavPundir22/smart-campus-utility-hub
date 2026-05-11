@@ -46,13 +46,11 @@ export const Header = () => {
 
   useEffect(() => {
     loadNotifications();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (!lastEventAt) return;
     loadNotifications();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastEventAt]);
 
   const markAsRead = async (id: number) => {
