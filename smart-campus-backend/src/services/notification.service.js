@@ -117,17 +117,10 @@ class NotificationService {
       return { created: 0, emailed: 0 };
     }
 
-    let created = 0;
-    let emailed = 0;
-
-    for (const user of users) {
+    const statuses = await Promise.all(users.map(async (user) => {
       const emailResult = sendEmail && user.email
         ? await this.sendEmailNotification(user.email, { title, message, metadata })
         : { status: 'skipped' };
-
-      if (emailResult.status === 'sent') {
-        emailed += 1;
-      }
 
       await query(
         `
@@ -145,8 +138,11 @@ class NotificationService {
         ]
       );
 
-      created += 1;
-    }
+      return emailResult.status;
+    }));
+
+    const emailed = statuses.filter((status) => status === 'sent').length;
+    const created = statuses.length;
 
     return { created, emailed };
   }

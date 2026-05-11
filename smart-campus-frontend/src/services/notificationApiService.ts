@@ -26,8 +26,9 @@ export const notificationApiService = {
       if (params?.unread_only !== undefined) search.set('unread_only', String(params.unread_only));
       if (params?.page) search.set('page', String(params.page));
       if (params?.limit) search.set('limit', String(params.limit));
+      const searchString = search.toString();
 
-      const data = asApiData(await api.get(`/notifications${search.toString() ? `?${search.toString()}` : ''}`));
+      const data = asApiData(await api.get(`/notifications${searchString ? `?${searchString}` : ''}`));
       return (data as { data: NotificationsResponse }).data;
     } catch (error) {
       withServiceError(error, 'Failed to load notifications');

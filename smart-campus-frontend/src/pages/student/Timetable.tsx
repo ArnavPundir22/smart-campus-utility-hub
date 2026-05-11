@@ -219,6 +219,9 @@ export default function StudentTimetable() {
         selectedAcademicYear,
         selectedSemesterType
       );
+      if (!blob) {
+        throw new Error('Calendar export returned no data');
+      }
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
       anchor.href = url;

@@ -48,6 +48,11 @@ const escapeIcsText = (value) =>
 const formatDateTime = (date) =>
   date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
 
+/**
+ * Returns the next occurrence of a weekday in UTC.
+ * @param {number} weekdayIndex 1=Monday ... 7=Sunday
+ * @returns {Date}
+ */
 const nextWeekdayDateUtc = (weekdayIndex) => {
   const now = new Date();
   const base = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
@@ -214,11 +219,19 @@ const exportGroupTimetableIcal = asyncHandler(async (req, res) => {
   const nowStamp = formatDateTime(new Date());
   for (const slot of slots) {
     const dayIndex = DAY_INDEX[slot.day_of_week];
+    if (!dayIndex) {
+      logger.warn('Skipping timetable slot with invalid day_of_week for iCal export', {
+        slotId: slot.id,
+        day_of_week: slot.day_of_week,
+      });
+      continue;
+    }
+
     const startTime = PERIOD_START_TIMES[slot.period_number] || '09:00';
     const endTime = PERIOD_END_TIMES[slot.period_number] || '09:50';
     const [startHour, startMinute] = startTime.split(':').map(Number);
     const [endHour, endMinute] = endTime.split(':').map(Number);
-    const firstDate = nextWeekdayDateUtc(dayIndex || 1);
+    const firstDate = nextWeekdayDateUtc(dayIndex);
 
     const startDate = new Date(firstDate);
     startDate.setUTCHours(startHour, startMinute, 0, 0);

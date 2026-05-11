@@ -1,7 +1,8 @@
-const { query, transaction } = require('../../config/db');
+const { query, transaction, logger } = require('../../config/db');
 const { ApiError } = require('../../middleware/errorHandler');
 const { parseInteger } = require('../../utils/request');
 const notificationService = require('../../services/notification.service');
+const NO_ALLOCATION_MESSAGE = 'None (No seat available)';
 
 const createElective = async ({ subject_name, description, max_students, department, semester }) => {
   const sql = `
@@ -199,7 +200,15 @@ const processWaitlistWithClient = async ({ client, electiveId = null }) => {
 
   for (const elective of electivesResult.rows) {
     let seatsAvailable = Number(elective.seats_available);
-    if (!Number.isFinite(seatsAvailable) || seatsAvailable <= 0) {
+    if (!Number.isFinite(seatsAvailable)) {
+      logger.warn('Invalid seats_available value while processing waitlist', {
+        electiveId: elective.id,
+        seats_available: elective.seats_available,
+      });
+      continue;
+    }
+
+    if (seatsAvailable <= 0) {
       continue;
     }
 
@@ -357,14 +366,14 @@ const allocateElectives = async () => {
           student_id: student.id,
           student_name: student.full_name,
           cgpa: student.cgpa,
-          allocated_elective: 'None (No seat available)',
+          allocated_elective: NO_ALLOCATION_MESSAGE,
           preference_rank: null
         });
       }
     }
 
     for (const resultEntry of results) {
-      if (resultEntry.allocated_elective !== 'None (No seat available)') {
+      if (resultEntry.allocated_elective !== NO_ALLOCATION_MESSAGE) {
         continue;
       }
 
