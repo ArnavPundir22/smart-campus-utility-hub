@@ -5,6 +5,20 @@ const userAdminService = require('./user.admin.service');
 const { asyncHandler } = require('../../middleware/errorHandler');
 const { logger } = require('../../config/db');
 
+const setAuthCookie = (res, token) => {
+  res.cookie(
+    userAuthService.AUTH_COOKIE_NAME,
+    token,
+    userAuthService.buildAuthCookieOptions(),
+  );
+};
+
+const clearAuthCookie = (res) => {
+  const cookieOptions = userAuthService.buildAuthCookieOptions();
+  const { maxAge, ...clearOptions } = cookieOptions;
+  res.clearCookie(userAuthService.AUTH_COOKIE_NAME, clearOptions);
+};
+
 /**
  * User Controller
  * Handles all user-related HTTP requests
@@ -26,10 +40,11 @@ const register = asyncHandler(async (req, res) => {
 
   logger.info('New user registered', { userId: result.user.id, email: result.user.email });
 
-    sendSuccess(res, 201, 'User registered successfully', { 
-      user: result.user, 
-      token: result.token 
-    });
+  setAuthCookie(res, result.token);
+
+  sendSuccess(res, 201, 'User registered successfully', {
+    user: result.user,
+  });
 
 });
 
@@ -41,11 +56,18 @@ const login = asyncHandler(async (req, res) => {
 
   logger.info('User logged in', { userId: result.user.id, email: result.user.email });
 
-  sendSuccess(res, 200, 'Login successful', { 
-    user: result.user, 
-    token: result.token 
+  setAuthCookie(res, result.token);
+
+  sendSuccess(res, 200, 'Login successful', {
+    user: result.user,
   });
 
+});
+
+/* Logout user --> POST /api/auth/logout */
+const logout = asyncHandler(async (_req, res) => {
+  clearAuthCookie(res);
+  sendSuccess(res, 200, 'Logout successful');
 });
 
 /* Get current user profile --> GET /api/auth/profile -> Protected route*/
@@ -216,8 +238,10 @@ const ssoCallback = asyncHandler(async (req, res) => {
 
     logger.info('User logged in via SSO', { userId: result.user.id, email: result.user.email, provider });
 
-    // Redirect to frontend with token
-    res.redirect(`http://localhost:5173/auth?token=${result.token}`);
+    setAuthCookie(res, result.token);
+
+    // Redirect to frontend after cookie is set
+    res.redirect('http://localhost:5173/auth?sso=success');
   } catch (error) {
     logger.error('SSO Callback Error', error);
     res.redirect('http://localhost:5173/auth?error=SSOFailed');
@@ -227,6 +251,7 @@ const ssoCallback = asyncHandler(async (req, res) => {
 module.exports = {
   register,
   login,
+  logout,
   getProfile,
   updateProfile,
   changePassword,
