@@ -31,6 +31,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const COOKIE_AUTH_STATE = 'cookie-authenticated';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -44,7 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const response = await authService.getProfile();
         const currentUser = response.data.user as User;
         setUser(currentUser);
-        setToken('cookie-authenticated');
+        setToken(COOKIE_AUTH_STATE);
         localStorage.setItem('user', JSON.stringify(currentUser));
       } catch {
         setUser(null);
@@ -58,6 +59,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     void initializeAuth();
   }, []);
 
+  useEffect(() => {
+    if (!user) return;
+
+    const revalidateSession = async () => {
+      try {
+        const response = await authService.getProfile();
+        const currentUser = response.data.user as User;
+        setUser(currentUser);
+        setToken(COOKIE_AUTH_STATE);
+        localStorage.setItem('user', JSON.stringify(currentUser));
+      } catch {
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem('user');
+      }
+    };
+
+    const handleWindowFocus = () => {
+      void revalidateSession();
+    };
+
+    window.addEventListener('focus', handleWindowFocus);
+    return () => window.removeEventListener('focus', handleWindowFocus);
+  }, [user]);
+
   const login = async (email: string, password: string): Promise<User> => {
     try {
       setIsLoading(true);
@@ -65,7 +91,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       const { user: userData } = response.data;
       setUser(userData as User);
-      setToken('cookie-authenticated');
+      setToken(COOKIE_AUTH_STATE);
       
       localStorage.setItem('user', JSON.stringify(userData));
       
@@ -87,7 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       const { user: newUser } = response.data;
       setUser(newUser as User);
-      setToken('cookie-authenticated');
+      setToken(COOKIE_AUTH_STATE);
       
       localStorage.setItem('user', JSON.stringify(newUser));
       
@@ -157,7 +183,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const userData = response.data.user;
       
       setUser(userData as User);
-      setToken('cookie-authenticated');
+      setToken(COOKIE_AUTH_STATE);
       localStorage.setItem('user', JSON.stringify(userData));
       
       return userData as User;
@@ -182,7 +208,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     logout,
     updateProfile,
     changePassword,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && !!token,
     isAdmin: user?.role === 'admin',
     isStudent: user?.role === 'student',
     isLoading,

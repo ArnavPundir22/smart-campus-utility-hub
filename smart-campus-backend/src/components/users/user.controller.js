@@ -5,6 +5,8 @@ const userAdminService = require('./user.admin.service');
 const { asyncHandler } = require('../../middleware/errorHandler');
 const { logger } = require('../../config/db');
 
+const getFrontendUrlWithDefault = () => process.env.FRONTEND_URL || 'http://localhost:5173';
+
 const setAuthCookie = (res, token) => {
   res.cookie(
     userAuthService.AUTH_COOKIE_NAME,
@@ -182,7 +184,7 @@ const ssoCallback = asyncHandler(async (req, res) => {
   const { code } = req.query;
 
   if (!code) {
-    return res.redirect('http://localhost:5173/auth?error=NoCodeProvided');
+    return res.redirect(`${getFrontendUrlWithDefault()}/auth?error=NoCodeProvided`);
   }
 
   let userInfo = null;
@@ -226,7 +228,7 @@ const ssoCallback = asyncHandler(async (req, res) => {
     }
 
     if (!userInfo || !userInfo.email) {
-      return res.redirect('http://localhost:5173/auth?error=ProfileFetchFailed');
+      return res.redirect(`${getFrontendUrlWithDefault()}/auth?error=ProfileFetchFailed`);
     }
 
     const result = await userAuthService.handleSSOLogin({
@@ -241,10 +243,10 @@ const ssoCallback = asyncHandler(async (req, res) => {
     setAuthCookie(res, result.token);
 
     // Redirect to frontend after cookie is set
-    res.redirect('http://localhost:5173/auth?sso=success');
+    res.redirect(`${getFrontendUrlWithDefault()}/auth?sso=success`);
   } catch (error) {
     logger.error('SSO Callback Error', error);
-    res.redirect('http://localhost:5173/auth?error=SSOFailed');
+    res.redirect(`${getFrontendUrlWithDefault()}/auth?error=SSOFailed`);
   }
 });
 
