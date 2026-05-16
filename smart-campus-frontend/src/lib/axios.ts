@@ -17,7 +17,7 @@ const refreshClient = axios.create({
 });
 
 const isRefreshExcludedEndpoint = (url?: string) => {
-  if (!url) return false;
+  if (!url) return false; 
 
   return [
     '/auth/login',
